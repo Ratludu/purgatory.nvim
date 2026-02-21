@@ -3,6 +3,7 @@ local config = require("purgatory.config")
 M.opts = {}
 
 
+---@return nil|string
 local function get_git_repo_name()
   local result = vim.fn.system("git rev-parse --show-toplevel 2>/dev/null")
   if vim.v.shell_error ~= 0 then
@@ -11,6 +12,8 @@ local function get_git_repo_name()
   return vim.fn.fnamemodify(result:gsub("\n", ""), ":t")
 end
 
+
+---@param filepath string
 local function check_buffer_exists(filepath)
   local existing_buf = vim.fn.bufnr(filepath)
   if existing_buf ~= -1 then
@@ -69,6 +72,7 @@ M.setup = function(user_opts)
   end
 end
 
+---@param filepath string
 function M.open(filepath)
   filepath = filepath or M.opts.filepath
   filepath = vim.fn.expand(filepath)
