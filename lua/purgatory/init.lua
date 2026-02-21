@@ -1,70 +1,12 @@
-local M = {}
+local helpers = require("purgatory.helpers")
 local config = require("purgatory.config")
+local M = {}
 M.opts = {}
 
 
----@return nil|string
-local function get_git_repo_name()
-  local result = vim.fn.system("git rev-parse --show-toplevel 2>/dev/null")
-  if vim.v.shell_error ~= 0 then
-    return nil -- not a git repo
-  end
-  return vim.fn.fnamemodify(result:gsub("\n", ""), ":t")
-end
-
-
----@param filepath string
-local function check_buffer_exists(filepath)
-  local existing_buf = vim.fn.bufnr(filepath)
-  if existing_buf ~= -1 then
-    local existing_win = vim.fn.bufwinid(existing_buf)
-    if existing_win ~= -1 then
-      vim.api.nvim_set_current_win(existing_win)
-      return
-    end
-    vim.api.nvim_buf_delete(existing_buf, { force = true })
-  end
-end
-
-local function open_floating_window(opts)
-  local opts = opts or {}
-  local width = vim.o.columns
-  local height = vim.o.lines
-
-  local win_width = opts.width or math.floor(width * (opts.width_percent or 0.5))
-  local win_height = opts.height or math.floor(height * (opts.height_percent or 0.5))
-
-  local row = math.floor((height - win_height) / 2)
-  local col = math.floor((width - win_width) / 2)
-
-  local buf = vim.api.nvim_create_buf(false, true)
-  local title_extension = get_git_repo_name()
-
-  local title = "purgatory - no repo"
-  if title_extension ~= nil then
-    title = "purgatory - " .. title_extension
-  end
-
-  local win_opts = {
-    relative = "editor", -- relative to the whole editor
-    width = win_width,
-    height = win_height,
-    row = row,
-    col = col,
-    style = "minimal",  -- no line numbers, sign column, etc.
-    border = "rounded", -- none | single | double | rounded | solid | shadow
-    title = title,
-    title_pos = "center",
-  }
-
-  local win = vim.api.nvim_open_win(buf, true, win_opts)
-
-  return buf, win
-end
 
 M.setup = function(user_opts)
   M.opts = vim.tbl_extend("force", config.defaults, user_opts or {})
-
   if M.opts.keymaps.open then
     vim.keymap.set("n", M.opts.keymaps.open, function()
       M.open()
@@ -72,19 +14,17 @@ M.setup = function(user_opts)
   end
 end
 
----@param filepath string
-function M.open(filepath)
-  filepath = filepath or M.opts.filepath
-  filepath = vim.fn.expand(filepath)
+function M.open()
+  local filepath = helpers.get_filepath()
 
-  check_buffer_exists(filepath)
+  helpers.check_buffer_exists(filepath)
 
   local lines = {}
   if vim.fn.filereadable(filepath) == 1 then
     lines = vim.fn.readfile(filepath)
   end
 
-  buf, win = open_floating_window(M.opts)
+  local buf, win = helpers.open_floating_window(M.opts)
 
   vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
 
