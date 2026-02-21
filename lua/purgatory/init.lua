@@ -1,8 +1,15 @@
 local M = {}
 local config = require("purgatory.config")
-
 M.opts = {}
 
+
+local function get_git_repo_name()
+  local result = vim.fn.system("git rev-parse --show-toplevel 2>/dev/null")
+  if vim.v.shell_error ~= 0 then
+    return nil -- not a git repo
+  end
+  return vim.fn.fnamemodify(result:gsub("\n", ""), ":t")
+end
 
 local function check_buffer_exists(filepath)
   local existing_buf = vim.fn.bufnr(filepath)
@@ -28,6 +35,12 @@ local function open_floating_window(opts)
   local col = math.floor((width - win_width) / 2)
 
   local buf = vim.api.nvim_create_buf(false, true)
+  local title_extension = get_git_repo_name()
+
+  local title = "purgatory - no repo"
+  if title_extension ~= nil then
+    title = "purgatory - " .. title_extension
+  end
 
   local win_opts = {
     relative = "editor", -- relative to the whole editor
@@ -37,7 +50,7 @@ local function open_floating_window(opts)
     col = col,
     style = "minimal",  -- no line numbers, sign column, etc.
     border = "rounded", -- none | single | double | rounded | solid | shadow
-    title = "purgatory",
+    title = title,
     title_pos = "center",
   }
 
