@@ -7,13 +7,11 @@ M.opts = {}
 local function check_buffer_exists(filepath)
   local existing_buf = vim.fn.bufnr(filepath)
   if existing_buf ~= -1 then
-    -- if it's already open in a window, just focus it
     local existing_win = vim.fn.bufwinid(existing_buf)
     if existing_win ~= -1 then
       vim.api.nvim_set_current_win(existing_win)
       return
     end
-    -- otherwise delete the old buffer so we can reopen cleanly
     vim.api.nvim_buf_delete(existing_buf, { force = true })
   end
 end
