@@ -12,6 +12,8 @@ A minimal Neovim plugin that opens a floating window for editing a text file —
 
 ## Installation
 
+Requires git to be installed.
+
 **[lazy.nvim](https://github.com/folke/lazy.nvim)**
 
 ```lua
@@ -40,12 +42,6 @@ Open the default file in a floating window:
 :Purgatory
 ```
 
-Open a specific file:
-
-```
-:Purgatory ~/notes.txt
-```
-
 Inside the window:
 
 | Key       | Action      |
@@ -60,12 +56,11 @@ Pass options to `setup()` to override the defaults:
 
 ```lua
 require("purgatory").setup({
-  filepath = "~/todo.txt",   -- default file to open
   width_percent = 0.8,       -- window width as a fraction of the editor
   height_percent = 0.8,      -- window height as a fraction of the editor
   border = "rounded",        -- border style: "none" | "single" | "double" | "rounded" | "solid" | "shadow"
   keymaps = {
-    open = "<leader>p",      -- keymap to open purgatory (optional)
+    open = "<leader>pg",      -- keymap to open purgatory (optional)
     close = { "<Esc>", "q" },
   },
 })
