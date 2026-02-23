@@ -32,23 +32,6 @@ function M.get_filepath()
   return filepath
 end
 
----@param filepath string
-function M.check_buffer_exists(filepath)
-  if filepath ~= nil then
-    return
-  end
-
-  local existing_buf = vim.fn.bufnr(filepath)
-  if existing_buf ~= -1 then
-    local existing_win = vim.fn.bufwinid(existing_buf)
-    if existing_win ~= -1 then
-      vim.api.nvim_set_current_win(existing_win)
-      return
-    end
-    vim.api.nvim_buf_delete(existing_buf, { force = true })
-  end
-end
-
 function M.open_floating_window(opts)
   local opts = opts or {}
   local width = vim.o.columns

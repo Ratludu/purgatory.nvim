@@ -17,11 +17,19 @@ end
 function M.open()
   local filepath = helpers.get_filepath()
 
-  helpers.check_buffer_exists(filepath)
-
   local lines = {}
   if vim.fn.filereadable(filepath) == 1 then
     lines = vim.fn.readfile(filepath)
+  end
+
+  local existing_buf = vim.fn.bufnr(filepath)
+  if existing_buf ~= -1 then
+    local existing_win = vim.fn.bufwinid(existing_buf)
+    if existing_win ~= -1 then
+      vim.api.nvim_set_current_win(existing_win)
+      return
+    end
+    vim.api.nvim_buf_delete(existing_buf, { force = true })
   end
 
   local buf, win = helpers.open_floating_window(M.opts)
@@ -30,8 +38,8 @@ function M.open()
 
   vim.bo[buf].filetype = "text"
   vim.bo[buf].modified = false
-  vim.api.nvim_buf_set_name(buf, filepath)
   vim.bo[buf].buftype = "acwrite"
+  vim.api.nvim_buf_set_name(buf, filepath)
 
   vim.api.nvim_create_autocmd("BufWriteCmd", {
     buffer = buf,
