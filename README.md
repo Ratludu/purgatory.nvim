@@ -1,3 +1,5 @@
+![Demo](assets/demo.gif)
+
 # purgatory.nvim
 
 A minimal Neovim plugin that opens a floating window for editing a text file — perfect for a scratchpad, todo list, or anything stuck in limbo.

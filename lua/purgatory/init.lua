@@ -1,9 +1,8 @@
 local helpers = require("purgatory.helpers")
 local config = require("purgatory.config")
+
 local M = {}
 M.opts = {}
-
-
 
 M.setup = function(user_opts)
   M.opts = vim.tbl_extend("force", config.defaults, user_opts or {})
@@ -32,7 +31,7 @@ function M.open()
     vim.api.nvim_buf_delete(existing_buf, { force = true })
   end
 
-  local buf, win = helpers.open_floating_window(M.opts)
+  local buf, _ = helpers.open_floating_window(M.opts)
 
   vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
 
